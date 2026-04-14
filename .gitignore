@@ -21,6 +21,9 @@ env/
 # Output directory (generated content)
 output/
 
+# Trace directory (generated tracing data)
+trace/
+
 # Environment variables
 .env
 
