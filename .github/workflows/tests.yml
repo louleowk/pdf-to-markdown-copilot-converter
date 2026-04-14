@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   test:
+    if: github.repository == 'louleowk/pdf-to-markdown-copilot-converter'
     runs-on: ubuntu-latest
 
     steps:
