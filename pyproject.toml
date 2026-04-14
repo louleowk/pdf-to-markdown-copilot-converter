@@ -20,6 +20,14 @@ pdf2md = "src.main:cli"
 testpaths = ["tests"]
 pythonpath = ["."]
 
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

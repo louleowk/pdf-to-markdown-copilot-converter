@@ -16,7 +16,7 @@ from src.pdf_processor import HighlightAnnotation, PageData
 DEFAULT_MARGIN_THRESHOLD = 72.0  # 1 inch
 
 # Sentence-ending punctuation pattern.
-_SENTENCE_END_RE = re.compile(r"[.!?…][\"'""']?\s*$")
+_SENTENCE_END_RE = re.compile(r"[.!?…][\"'\u201c\u201d\u2018\u2019]?\s*$")
 
 
 @dataclasses.dataclass
