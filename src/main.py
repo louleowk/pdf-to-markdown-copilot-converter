@@ -15,6 +15,7 @@ from src.cross_page_merger import merge_cross_page_highlights
 from src.input_source import get_source
 from src.markdown_writer import build_markdown, write_markdown
 from src.pdf_processor import process_pdf
+from src.tracer import Tracer
 
 # ---------------------------------------------------------------------------
 # Eagerly import all built-in providers so they auto-register.
@@ -59,12 +60,22 @@ logger = logging.getLogger(__name__)
     is_flag=True,
     help="Enable verbose / debug logging.",
 )
-def cli(input_ref: str, ai_provider: str | None, output_dir: str, verbose: bool) -> None:
+@click.option(
+    "--trace",
+    is_flag=True,
+    help="Enable tracing. Saves intermediate data under trace/<trace_id>/ for verification.",
+)
+def cli(input_ref: str, ai_provider: str | None, output_dir: str, verbose: bool, trace: bool) -> None:
     """Convert highlighted PDF text into well-structured Markdown notes."""
     logging.basicConfig(
         level=logging.DEBUG if verbose else logging.INFO,
         format="%(levelname)s: %(message)s",
     )
+
+    # 0. Set up tracing.
+    tracer = Tracer.create() if trace else Tracer.noop()
+    if trace:
+        click.echo(f"Tracing enabled — trace id: {tracer.trace_id}")
 
     # 1. Resolve input source.
     source = get_source(input_ref)
@@ -86,27 +97,40 @@ def cli(input_ref: str, ai_provider: str | None, output_dir: str, verbose: bool)
         # 3. Extract data from PDF.
         click.echo(f"Processing: {pdf_path.name}")
         pages = process_pdf(pdf_path)
+        tracer.save_page_data(pages)
 
         # 4. Merge cross-page highlights.
         pages, merged = merge_cross_page_highlights(pages)
+        tracer.save_extracted_data(pages, merged)
 
         # 5. Build raw Markdown from extracted data.
         raw_md = build_markdown(pages, merged)
+        tracer.save_raw_markdown(raw_md)
 
         # 6. Optionally run through AI formatter.
         formatted_md = format_with_ai(raw_md, provider_name=ai_provider)
+        tracer.save_formatted_markdown(formatted_md)
 
         # 7. Write output.
         out_path = write_markdown(formatted_md, pdf_path.name, Path(output_dir))
         click.echo(f"Output written to: {out_path}")
 
-        # 8. Update audit log.
+        # 8. Save trace metadata & update audit log.
+        tracer.save_metadata(
+            input_file=pdf_path.name,
+            ai_provider=ai_provider,
+            output_file=str(out_path),
+        )
+
         log_entry(
             original_filename=pdf_path.name,
             audit_filename=audit_name,
             status="completed",
             output_file=str(out_path),
         )
+
+        if trace:
+            click.echo(f"Trace data written to: {tracer.root}")
 
     except Exception as exc:
         log_entry(
