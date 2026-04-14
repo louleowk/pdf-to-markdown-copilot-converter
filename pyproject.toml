@@ -1,0 +1,33 @@
+[project]
+name = "pdf-to-markdown-copilot-converter"
+version = "0.1.0"
+description = "Convert highlighted PDF text into well-structured Markdown notes, powered by AI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "PyMuPDF==1.25.4",
+    "click==8.1.8",
+    "requests==2.32.3",
+    "openai==1.82.0",
+    "google-generativeai==0.8.5",
+]
+
+[project.scripts]
+pdf2md = "src.main:cli"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
