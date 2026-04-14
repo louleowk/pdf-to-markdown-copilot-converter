@@ -74,7 +74,7 @@ A tool that converts highlighted text from PDF files into well-structured Markdo
   - Prompt template example:
     ```
     The following text was extracted from a PDF. Please verify it makes sense,
-    fix any obvious errors, and format it as clean Markdown with proper headings
+    fix any obvious artifacts, and format it as clean Markdown with proper headings
     and bullet points.
 
     ---
