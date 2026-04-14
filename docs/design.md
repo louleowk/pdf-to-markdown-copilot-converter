@@ -54,7 +54,7 @@ A tool that converts highlighted text from PDF files into well-structured Markdo
 
 - **Responsibility:** Parse the PDF page by page and extract:
   - **Titles / Headers** — detected by font size, weight, or style metadata.
-  - **Highlight Annotations** — PDF highlight annotations (the standard annotation type `/Highlight` stored in the PDF's annotation layer). These are the coloured overlays readers add to mark important text.
+  - **Highlight Annotations** — PDF highlight annotations (the standard annotation type `/Highlight` stored in the PDF's annotation layer). These are the colored overlays readers add to mark important text.
   - **Page Numbers** — retained as metadata for reference.
 - **Technology Candidates:**
   - Python: `PyMuPDF` (fitz) — excellent support for annotations and text extraction.
@@ -67,8 +67,8 @@ Highlight annotations sometimes span a page break (i.e., the reader highlighted 
 
 1. After extracting annotations from all pages, sort highlights by `(page, y-coordinate)`.
 2. For each pair of consecutive highlights on adjacent pages, check:
-   - The last highlight on page *N* ends near the bottom margin **and** the first highlight on page *N+1* starts near the top margin.
-   - The two text fragments form an incomplete sentence when taken individually (heuristic: the first fragment does not end with sentence-ending punctuation).
+   - The last highlight on page *N* ends within a configurable margin threshold (default: 72 pt / 1 inch) of the bottom edge **and** the first highlight on page *N+1* starts within the same threshold of the top edge.
+   - The two text fragments form an incomplete sentence when taken individually (heuristic: the first fragment does not end with sentence-ending punctuation **and** the second fragment starts with a lowercase letter).
 3. When both conditions are met, merge the two highlights into a single logical block and tag it with the originating page range (e.g., `pages: [3, 4]`).
 4. The merged highlight is stored once and excluded from the per-page lists to avoid duplication.
 
@@ -215,7 +215,7 @@ pdf-to-markdown-copilot-converter/
 |------------------------|-----------------------------|--------------------------------------------------------------|
 | Language               | Python 3.10+                | Rich PDF libraries, AI SDK support                           |
 | Package Management     | **Poetry**                  | Dependency resolution, lock file, virtual env creation        |
-| Virtual Environment    | Poetry-managed venv         | `poetry install` creates an isolated env automatically        |
+| Virtual Environment    | Poetry-managed venv         | `poetry install` creates an isolated virtual environment     |
 | PDF Parsing            | PyMuPDF (fitz)              | Best annotation + highlight extraction                       |
 | AI Integration         | Pluggable provider registry | Copilot CLI, Google Gemini, OpenAI ChatGPT (see §4.3)       |
 | Google Drive Access    | `google-api-python-client`  | OAuth 2.0 file download for remote PDFs                      |
