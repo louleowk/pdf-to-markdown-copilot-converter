@@ -181,8 +181,8 @@ and bullet points.
 pdf-to-markdown-copilot-converter/
 ├── README.md
 ├── Agents.md                  # Shared requirements for all agents
-├── pyproject.toml             # Project metadata & dependencies (Poetry)
-├── poetry.lock                # Locked dependency versions
+├── pyproject.toml             # Project metadata & dependencies (uv)
+├── uv.lock                    # Locked dependency versions
 ├── docs/
 │   └── design.md              # This document
 ├── audit/                     # Tracked user inputs and run logs
@@ -214,8 +214,8 @@ pdf-to-markdown-copilot-converter/
 | Component              | Technology                  | Reason                                                       |
 |------------------------|-----------------------------|--------------------------------------------------------------|
 | Language               | Python 3.10+                | Rich PDF libraries, AI SDK support                           |
-| Package Management     | **Poetry**                  | Dependency resolution, lock file, virtual env creation        |
-| Virtual Environment    | Poetry-managed venv         | `poetry install` creates an isolated virtual environment     |
+| Package Management     | **uv**                      | Fast dependency resolution, lock file, virtual env creation   |
+| Virtual Environment    | uv-managed venv             | `uv sync` creates an isolated virtual environment            |
 | PDF Parsing            | PyMuPDF (fitz)              | Best annotation + highlight extraction                       |
 | AI Integration         | Pluggable provider registry | Copilot CLI, Google Gemini, OpenAI ChatGPT (see §4.3)       |
 | Google Drive Access    | `google-api-python-client`  | OAuth 2.0 file download for remote PDFs                      |
@@ -224,14 +224,14 @@ pdf-to-markdown-copilot-converter/
 
 ## 7. User Workflow
 
-1. **Install dependencies:** `poetry install` (creates the virtual environment automatically).
+1. **Install dependencies:** `uv sync` (creates the virtual environment and installs all packages).
 2. **Run the tool:**
    ```bash
    # Local file with default AI provider (Copilot)
-   poetry run python src/main.py --input my_document.pdf
+   uv run python src/main.py --input my_document.pdf
 
    # Google Drive file with Gemini
-   poetry run python src/main.py --input gdrive://1aBcDeFgHiJk --ai-provider gemini
+   uv run python src/main.py --input gdrive://1aBcDeFgHiJk --ai-provider gemini
    ```
 3. The Input Source Handler fetches/locates the PDF and copies it to `audit/` with a timestamp.
 4. The PDF Processor extracts titles, headers, and highlight annotations page by page.
